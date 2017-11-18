@@ -100,10 +100,12 @@ Grow your audience or land a record deal with kick ass visualizations
 ### ... Inception
 ```js
 // actions
-const actions = app.adapt({
-	initial: {num: 0},
-	incr: () => state => ({num: state.num + 1})
-});
+const actions$ = new Rx.Subject();
+const actions = {
+	incr: () => actions$.onNext(
+		state => ({num: state.num + 1})),
+	initial: {num: 0}
+};
 
 // ui (hyperscript)
 const {div, span, button} = vdom;
@@ -113,7 +115,7 @@ const ui = ({state, actions}) => div('#ui', [
 ]);
 
 // reducing the stream of actions to the app state
-const state$ = actions.stream
+const state$ = actions$
 	.startWith(() => actions.initial)
 	.scan((state, reducer) => reducer(state), {})
 	.share();
